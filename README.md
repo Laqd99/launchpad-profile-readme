@@ -16,6 +16,7 @@ A starter backend for a Plaud-like transcription app focused on **post-call uplo
   - all others -> `chirp_3`
 - Monthly budget guard with cap set to `$50`.
 - In-memory storage layer (MVP scaffold) to be replaced by PostgreSQL + cloud storage.
+- In-memory state is process-local; run as a single worker for consistent MVP behavior.
 
 ## Quickstart
 

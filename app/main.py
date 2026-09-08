@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import json
-
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import PlainTextResponse
 
@@ -28,6 +26,8 @@ async def create_upload(
         raise HTTPException(status_code=400, detail="language_hint must be auto, en-US, or fr-FR")
     if expected_speakers < 1 or expected_speakers > 6:
         raise HTTPException(status_code=400, detail="expected_speakers must be between 1 and 6")
+    if duration_sec <= 0 or duration_sec > 28800:
+        raise HTTPException(status_code=400, detail="duration_sec must be > 0 and <= 28800")
 
     # MVP note: this validates file presence but does not persist bytes yet.
     _ = await file.read(16)
@@ -52,6 +52,8 @@ def process_job(job_id: str) -> dict:
     processed = service.process_job(job_id)
     if not processed:
         raise HTTPException(status_code=500, detail="failed to process job")
+    if processed.status == JobStatus.blocked_budget:
+        raise HTTPException(status_code=402, detail="job blocked due to monthly budget cap")
     return {"job_id": processed.job_id, "status": processed.status}
 
 
